@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Lambda::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      FunctionName: !Sub "HelloWorldFunction"
+      # CodeUri: go_function.zip
+      Code:
+        S3Bucket: "documentos-pdf"
+        S3Key: "deployments/go_function.zip"
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [x86_64]
+      Timeout: 120
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENV: !Sub "DEV"
+      Role: !GetAtt LambdaExecutionRole.Arn
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+Outputs:
+  FunctionName:
+    Description: "The name of the HelloWorld Lambda function"
+    Value: !Ref HelloWorldFunction
+    Export:
+      Name: HelloWorldFunctionName
+
+  FunctionArn:
+    Description: "The ARN of the HelloWorld Lambda function"
+    Value: !GetAtt HelloWorldFunction.Arn
+    Export:
+      Name: HelloWorldFunctionArn
