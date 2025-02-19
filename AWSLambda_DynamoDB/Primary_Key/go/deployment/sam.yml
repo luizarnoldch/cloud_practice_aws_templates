@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+  UserDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: UserTableTest
+      PrimaryKey:
+        Name: ID
+        Type: String
+
+  SaveUserFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      FunctionName: !Sub "SaveUserFunction"
+      CodeUri: go_function.zip
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [x86_64]
+      Timeout: 120
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENV: !Sub "DEV"
+          USER_TABLE: !Ref UserDynamoDBTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserDynamoDBTable
+
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      FunctionName: !Sub "GetUserFunction"
+      CodeUri: go_function.zip
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [x86_64]
+      Timeout: 120
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENV: !Sub "DEV"
+          USER_TABLE: !Ref UserDynamoDBTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserDynamoDBTable
+
+Outputs:
+  UserDynamodbTableName:
+    Description: "The User Dynamodb Table"
+    Value: !Ref UserDynamoDBTable
+    Export:
+      Name: !Ref UserDynamoDBTable
+
+  SaveUserFunctionArn:
+    Description: "The ARN of the SaveUserFunction Lambda function"
+    Value: !GetAtt SaveUserFunction
+    Export:
+      Name: !Ref SaveUserFunction
+
+  GetUserFunctionArn:
+    Description: "The ARN of the GetUserFunction Lambda function"
+    Value: !GetAtt GetUserFunction
+    Export:
+      Name: !Ref GetUserFunction

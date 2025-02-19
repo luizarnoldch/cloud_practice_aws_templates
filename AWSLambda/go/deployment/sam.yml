@@ -7,7 +7,7 @@ Resources:
       BuildMethod: go1.x
     Properties:
       FunctionName: !Sub "HelloWorldFunction"
-      CodeUri: go_function.zip
+      CodeUri: ../go_function.zip
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [x86_64]

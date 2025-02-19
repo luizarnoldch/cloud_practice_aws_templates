@@ -1,10 +1,16 @@
-TEMPLATE_FILE := deploy.yml
-STACK_NAME := go-lambda-practice
+SAM_TEMPLATE_FILE := deployment/sam.yml
+STACK_NAME := go-lambda-dynamodb-practice
 
 test:
-		echo "test makefile"
+		go test ./... -v
 build:
 	./build_go.sh
+docker-up:
+	docker-compose up -d
+docker-down:
+	docker-compose down
+docker-down-all:
+	docker-compose down -v
 run:
 	./run_lambda.sh
 deploy:
